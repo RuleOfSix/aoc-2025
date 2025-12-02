@@ -21,9 +21,11 @@ fn main() {
 }
 
 fn run_part1() {
+    let input = read_input();
     unimplemented!()
 }
 
 fn run_part2() {
+    let input = read_input();
     unimplemented!()
 }
