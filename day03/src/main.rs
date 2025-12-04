@@ -29,12 +29,20 @@ fn run_part1() {
         .collect();
     let mut total = 0;
     for bank in banks {
-        total += bank.joltage();
+        total += bank.joltage(2);
     }
     println!("Total joltage: {total}");
 }
 
 fn run_part2() {
-    let input = read_input();
-    unimplemented!()
+    let banks: Vec<BatteryBank> = read_input()
+        .split("\n")
+        .filter(|b| !b.is_empty())
+        .map(|b| BatteryBank::from(b))
+        .collect();
+    let mut total = 0;
+    for bank in banks {
+        total += bank.joltage(12);
+    }
+    println!("Total joltage: {total}");
 }

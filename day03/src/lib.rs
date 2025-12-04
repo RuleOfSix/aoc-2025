@@ -19,26 +19,41 @@ impl From<&str> for BatteryBank {
 }
 
 impl BatteryBank {
-    pub fn joltage(&self) -> u32 {
-        let tup_max = |(ai, acc), (i, n)| if n > acc { (i, n) } else { (ai, acc) };
-        let (d1_index, d1) = self
-            .batteries
-            .split_last()
-            .unwrap()
-            .1
-            .iter()
-            .enumerate()
-            .reduce(tup_max)
-            .unwrap();
-        let d2 = self
-            .batteries
-            .split_at(d1_index)
-            .1
-            .iter()
-            .skip(1)
-            .reduce(|acc, b| acc.max(b))
-            .unwrap();
-        10 * d1 + d2
+    pub fn to_string(&self) -> String {
+        let mut output = String::from("");
+        for digit in &self.batteries {
+            output.push_str(&digit.to_string());
+        }
+        output
+    }
+
+    pub fn joltage(&self, num_digits: usize) -> u64 {
+        let max_with_index = |(ai, acc), (i, n)| if n > acc { (i, n) } else { (ai, acc) };
+        let mut digits: Vec<(usize, u32)> = Vec::new();
+        digits.push(
+            self.batteries
+                .iter()
+                .enumerate()
+                .map(|(i, b)| (i, *b))
+                .take_while(|(i, _)| *i <= self.batteries.len() - num_digits)
+                .reduce(max_with_index)
+                .unwrap(),
+        );
+        for n in 1..num_digits {
+            digits.push(
+                self.batteries
+                    .iter()
+                    .enumerate()
+                    .skip_while(|(i, _)| *i <= digits[n - 1].0)
+                    .filter(|(i, _)| self.batteries.len() - i >= num_digits - n)
+                    .map(|(i, b)| (i, *b))
+                    .reduce(max_with_index)
+                    .unwrap(),
+            );
+        }
+        digits.iter().enumerate().fold(0, |acc, (i, (_, n))| {
+            acc + 10_u64.pow((num_digits - i - 1) as u32) * *n as u64
+        })
     }
 }
 
